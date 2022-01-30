@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { Ionicons } from '@expo/vector-icons';
+import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons, Fontisto } from '@expo/vector-icons';
+import { storeHistory } from './../components/HistoryStorage';
+import { styles } from '../assets/styles/Styles';
 
-const CalculatorMainScreen = () => {
+const CalculatorMainScreen = (props) => {
 
     const [resultText, setResultText] = useState("");
     const [calText, setCalText] = useState("0");
@@ -15,21 +16,30 @@ const CalculatorMainScreen = () => {
         }
         if (calText !== "0" && calText !== 0 && calText !== "") {
             setCalText(calText + inputValue);
-        }else{
+        } else {
             setCalText(inputValue);
         }
     };
 
     const calculateResult = () => {
+        const checkLastOperator = calText.slice(-1);
+        const initialValue = "0";
+        let finalCalValue;
+        //last last digit of calText is any operators, then add 0 as like value
+        if (checkLastOperator == "+" || checkLastOperator == "-" || checkLastOperator == "*" || checkLastOperator == "/") {
+            finalCalValue = calText.concat(initialValue);
+        } else {
+            finalCalValue = calText;
+        }
         setCalText(calText)
-        setResultText(eval(calText));
+        setResultText(eval(finalCalValue));
+        return storeHistory(calText)
     };
 
     const onOperationClick = (operation) => {
         let operations = ["DEL", "+", "-", "*", "/", "%"];
 
         if (operation == "DEL") {
-            // const subStringText = calText.toString().substring(0, calText.length - 1);
             if (resultText !== "" && resultText !== 0) {
                 setResultText("")
                 return setCalText(
@@ -66,9 +76,19 @@ const CalculatorMainScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.valueBox}>
-                <View style={styles.titleBox}>
-                    <Ionicons name="calculator-outline" size={30} color="#f9f9f9" />
-                    <Text style={styles.title}>Calculator </Text>
+                <View style={styles.headerBox}>
+                    <View style={styles.titleBox}>
+                        <Ionicons name="calculator-outline" size={30} color="#f9f9f9" />
+                        <Text style={styles.title}>Calculator </Text>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.historyBtn}
+                        onPress={() => {
+                            props.navigation.navigate('History');
+                        }}
+                    >
+                        <Fontisto name="history" size={30} color="#f9f9f9" />
+                    </TouchableOpacity>
                 </View>
                 <Text style={styles.calculatorText}>{resultText !== "" && resultText !== 0 && calText}</Text>
                 <ScrollView vertical>
@@ -152,84 +172,5 @@ const CalculatorMainScreen = () => {
 
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 2,
-        backgroundColor: '#082032',
-    },
-    valueBox: {
-        flex: 0.6,
-        padding: 10,
-
-    },
-    titleBox: {
-        width: wp(40),
-        alignSelf: "center",
-        justifyContent: "space-evenly",
-        alignItems: "center",
-        marginTop: 40,
-        flexDirection: "row"
-    },
-    title: {
-        fontSize: 30,
-        color: "#f9f9f9",
-        marginLeft: 10
-    },
-    calculatorText: {
-        alignSelf: "flex-end",
-        fontSize: 30,
-        color: "#f9f9f9",
-        marginTop: 30,
-    },
-    resultText: {
-        alignSelf: "flex-end",
-        fontSize: 60,
-        color: "#f9f9f9",
-        fontWeight: "bold",
-    },
-    btnBox: {
-        flex: 1.2,
-        padding: 10,
-        borderTopColor: "#30536e",
-        borderWidth: 1,
-        borderRadius: 25,
-    },
-    btnRow: {
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        padding: 10
-    },
-    btn: {
-        width: 70,
-        height: 70,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 10,
-        backgroundColor: "#183245",
-        // elevation: 40,
-        // borderWidth: 1,
-        // borderColor: "white"
-    },
-    btnText: {
-        fontSize: 25,
-        color: "#f9f9f9",
-    },
-    symbolicText: {
-        fontSize: 25,
-        color: "#ff4c29",
-    },
-    equalBtn: {
-        width: 160,
-        height: 70,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 10,
-        elevation: 25,
-        backgroundColor: "#ff4c29",
-        color: "#f9f9f9"
-    },
-});
-
 
 export default CalculatorMainScreen;
