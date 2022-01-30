@@ -13,7 +13,11 @@ const CalculatorMainScreen = () => {
 
             return calculateResult();
         }
-        setCalText(calText + inputValue);
+        if (calText !== "0" && calText !== 0 && calText !== "") {
+            setCalText(calText + inputValue);
+        }else{
+            setCalText(inputValue);
+        }
     };
 
     const calculateResult = () => {
@@ -32,7 +36,7 @@ const CalculatorMainScreen = () => {
                     resultText.toString().substring(0, calText.length - 1)
                 );
             } else {
-                if (calText !== "0") {
+                if (calText.length > 1) {
                     return setCalText(
                         calText.toString().substring(0, calText.length - 1)
                     );
